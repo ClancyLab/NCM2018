@@ -111,12 +111,19 @@ def updatePosterior(mu, cov, x, y, debug=None):
 
 def opt_hps_parallel(dat):
     x, y, sp, val, bnds = dat
-    f = lambda *args: -1.0 * likelihood(x, y, sp, *args)
+    f = lambda *args: -1.0 * likelihood(x, y, sp, False, *args)
     res = op.minimize(f, val, bounds=bnds)
     return res['x'], res.fun
 
 
-def MLE_parallel(x, y, sp, n_start=None):
+def opt_hps_parallel_simple(dat):
+    x, y, sp, val, bnds = dat
+    f = lambda *args: -1.0 * likelihood(x, y, sp, True, *args)
+    res = op.minimize(f, val, bounds=bnds)
+    return res['x'], res.fun
+
+
+def MLE_parallel(x, y, sp, n_start=None, method=None):
     '''
     Given sampled data, use the maximum likelihood-estimator to find
     hyperparameters.
@@ -146,10 +153,23 @@ def MLE_parallel(x, y, sp, n_start=None):
     if len(sp[0]) == 1:
         bounds = bounds[:-2] + [(1.0, 1.0)]
 
-    # init_values = [
-    #     (x, y, sp, [np.random.random() * (b[1] + b[0]) - b[0] for b in bounds], bounds)
-    #     for j in range(n_start)
-    # ]
+    if method is not None and method == "simple":
+        bounds = [
+            (1E-3, 1),  # h1_Br
+            (1E-3, 1),  # h1_Cl
+            (1E-3, 1),  # h1_I
+            (1E-3, 1),  # h2_Br
+            (1E-3, 1),  # h2_Cl
+            (1E-3, 1),  # h2_I
+            (1E-3, 1),  # h3_Br
+            (1E-3, 1),  # h3_Cl
+            (1E-3, 1),  # h3_I
+            (1E-3, 1),  # c_Cs
+            (1E-3, 1),  # c_FA
+            (1E-3, 1),  # c_MA
+            (1E-3, 1),  # Dielectric
+            (1E-3, 1)  # sigma
+        ]
 
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
 
@@ -162,7 +182,11 @@ def MLE_parallel(x, y, sp, n_start=None):
     lkh_list = np.zeros(n_start)
 
     pool = mp.Pool(processes=PROCESSES_ALLOWED)
-    all_res = pool.map(opt_hps_parallel, init_values)
+    # print '\n'.join([str(i) for i in init_values])
+    if method is not None and method == "simple":
+        all_res = pool.map(opt_hps_parallel_simple, init_values)
+    else:
+        all_res = pool.map(opt_hps_parallel, init_values)
     pool.terminate()
 
     for i, res in zip(range(n_start), all_res):
@@ -175,7 +199,7 @@ def MLE_parallel(x, y, sp, n_start=None):
     return best_theta
 
 
-def MLE(x, y, sp, n_start=None):
+def MLE(x, y, sp, n_start=None, method=None):
     '''
     Given sampled data, use the maximum likelihood-estimator to find
     hyperparameters.
@@ -203,6 +227,24 @@ def MLE(x, y, sp, n_start=None):
     if len(sp[0]) == 1:
         bounds = bounds[:-2] + [(1.0, 1.0)]
 
+    if method is not None and method == 'simple':
+        bounds = [
+            (1E-3, 1),  # h1_Br
+            (1E-3, 1),  # h1_Cl
+            (1E-3, 1),  # h1_I
+            (1E-3, 1),  # h2_Br
+            (1E-3, 1),  # h2_Cl
+            (1E-3, 1),  # h2_I
+            (1E-3, 1),  # h3_Br
+            (1E-3, 1),  # h3_Cl
+            (1E-3, 1),  # h3_I
+            (1E-3, 1),  # c_Cs
+            (1E-3, 1),  # c_FA
+            (1E-3, 1),  # c_MA
+            (1E-3, 1),  # Dielectric
+            (1E-3, 1)  # sigma
+        ]
+
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
 
     init_values = [
@@ -214,7 +256,10 @@ def MLE(x, y, sp, n_start=None):
     lkh_list = np.zeros(n_start)
     # MLE = Maximum Likelihood Estimation.  But we use a minimizer! So invert the
     # likelihood instead.
-    f = lambda *args: -1.0 * likelihood(x, y, sp, *args)
+    if method is not None and method == 'simple':
+        f = lambda *args: -1.0 * likelihood(x, y, sp, True, *args)
+    else:
+        f = lambda *args: -1.0 * likelihood(x, y, sp, False, *args)
 
     # For each possible starting of parameters, minimize and store the resulting likelihood
     for i in range(n_start):
@@ -229,7 +274,7 @@ def MLE(x, y, sp, n_start=None):
     return best_theta
 
 
-def likelihood(x, y, sp, theta):
+def likelihood(x, y, sp, simple, theta):
     '''
     This function computes the likehood of solubilities given hyper parameters
     in the list theta.
@@ -257,11 +302,15 @@ def likelihood(x, y, sp, theta):
 
     # ASSUME: HP = [mu_alpha, sig_alpha, sig_beta, mu_zeta, sig_zeta, sig_m, l1, l2]
 
-    mu = np.array([4 * theta[0] + theta[3] for i in x])
-    cov = theta[1] * np.dot(x, x.T) +\
-        theta[2] * np.diag(np.ones(len(x))) +\
-        theta[4] +\
-        mk52(sp, theta[-len(sp[0]):], theta[-(len(sp[0]) + 1)])
+    if simple:
+        mu = np.array([0.0 for i in x])
+        cov = mk52([list(xx) + list(ss) for xx, ss in zip(x, sp)], theta[:-1], theta[-1])
+    else:
+        mu = np.array([4 * theta[0] + theta[3] for i in x])
+        cov = theta[1] * np.dot(x, x.T) +\
+            theta[2] * np.diag(np.ones(len(x))) +\
+            theta[4] +\
+            mk52(sp, theta[-len(sp[0]):], theta[-(len(sp[0]) + 1)])
 
     Y = np.array(y) - mu
 

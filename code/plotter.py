@@ -28,8 +28,8 @@ def plot(stats, se_scale=2.0):
     plt.figure(figsize=(10, 8))
 
     # We store the keys to ensure the order is always the same.
-    keys = ["PAL", "SMAC", "RANDOM"]
-    offset = {"PAL": 0, "SMAC": 0, "RANDOM": 0}
+    keys = ["PAL", "SMAC", "SIMPLE", "RANDOM"]
+    offset = {"PAL": 0, "SMAC": 0, "SIMPLE": 0, "RANDOM": 0}
     for key in keys:
         N_POINTS = len(stats[key][0])
         mu, se = stats[key]

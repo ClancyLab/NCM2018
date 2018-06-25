@@ -63,7 +63,7 @@ def _spaced_print(sOut, delim=['\t', ' '], buf=4):
 
 def pretty_stats(stats):
     data = "Methods\tAvg\tStd\t95%\tReplications\n"
-    for key in ["PAL", "SMAC", "RANDOM"]:
+    for key in ["PAL", "SMAC", "SIMPLE", "RANDOM"]:
         avg = np.mean(stats[key][0])
         std = np.std(stats[key][0])
         reps = len(stats[key][0])
