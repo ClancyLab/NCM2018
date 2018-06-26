@@ -165,7 +165,7 @@ def run_simple(dataset, stats, NUM_RUNS=1000, parallel=True, on_queue=False):
     jobs_on_queue = []
     for run in range(NUM_RUNS):
         if not on_queue:
-            pal.printProgressBar(run, NUM_RUNS, prefix="Running PAL case...")
+            pal.printProgressBar(run, NUM_RUNS, prefix="Running SIMPLE case...")
 
         dump_obj = [run, START, use_eps, use_rho, data, data_x2, data_x, data_y, data_sp, NUM_REOPT, parallel]
         if on_queue:
@@ -179,7 +179,7 @@ def run_simple(dataset, stats, NUM_RUNS=1000, parallel=True, on_queue=False):
 
     if on_queue:
         for run, j in enumerate(jobs_on_queue):
-            pal.printProgressBar(run, NUM_RUNS, prefix="Running PAL case...")
+            pal.printProgressBar(run, NUM_RUNS, prefix="Running SIMPLE case...")
 
             best_y = j.get_best_y()
 
@@ -201,11 +201,11 @@ def run_simple(dataset, stats, NUM_RUNS=1000, parallel=True, on_queue=False):
 
     stats["SIMPLE"] = [n_to_max, N_POINTS]
 
-    pal.printProgressBar(NUM_RUNS, NUM_RUNS, prefix="Running PAL case...", suffix="Done")
+    pal.printProgressBar(NUM_RUNS, NUM_RUNS, prefix="Running SIMPLE case...", suffix="Done")
     return dataset, stats
 
 
 if __name__ == "__main__":
-    print("Running PAL simple for only one replication! If you wish to do a full run, please use the run.py code.")
+    print("Running SIMPLE for only one replication! If you wish to do a full run, please use the run.py code.")
     t0 = time.time()
     dataset, stats = run_simple({}, {}, NUM_RUNS=1, parallel=True, on_queue=False)
