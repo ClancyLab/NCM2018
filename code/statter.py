@@ -61,13 +61,13 @@ def _spaced_print(sOut, delim=['\t', ' '], buf=4):
     return '\n'.join(sOut)
 
 
-def pretty_stats(stats):
-    data = "Methods\tAvg\tStd\t95%\tReplications\n"
-    for key in ["PAL", "SMAC", "SIMPLE", "RANDOM"]:
+def pretty_stats(stats, p=0.999):
+    data = "Methods\tAvg\tStd\t%d%%\tReplications\n" % int(p * 100)
+    for key in ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]:
         avg = np.mean(stats[key][0])
         std = np.std(stats[key][0])
         reps = len(stats[key][0])
-        p95 = int(len(stats[key][0]) * 0.95 - 1.0)
+        p95 = int(len(stats[key][0]) * p - 1.0)
         p95 = sorted(stats[key][0])[p95]
         data += "%s\t%.1f\t%.1f\t%d\t%d\n" % (key, avg, std, p95, reps)
 
@@ -77,6 +77,20 @@ def pretty_stats(stats):
     print('\n'.join(data))
 
 
+def pretty_stats_2(stats, p=[0.95, 0.98, 0.999]):
+    data = "Methods\t" + '\t'.join(["%.1f%%" % (pp * 100) for pp in p]) + '\n'
+    for key in ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]:
+        pval = [int(len(stats[key][0]) * pp - 1.0) for pp in p]
+        pval = [sorted(stats[key][0])[pp] for pp in pval]
+        data += str(key) + "\t" + "\t".join(["%d" % pp for pp in pval]) + "\n"
+
+    data = _spaced_print(data).split("\n")
+    data = [data[0]] + ["-" * len(data[0])] + data[1:]
+    print("\n")
+    print('\n'.join(data))
+
+
 if __name__ == "__main__":
-    _, a = pickle.load(open("final.pickle", 'rb'))
+    _, a = pickle.load(open("../data/final.pickle", 'rb'))
     pretty_stats(a)
+    pretty_stats_2(a)

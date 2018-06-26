@@ -29,6 +29,7 @@ import cPickle as pickle
 # Note - to import this you'll either have to be in the same folder as plotter
 # and portable_pal, or add that path to your PYTHONPATH environment variable.
 from plotter import plot
+from statter import pretty_stats, pretty_stats_2
 from portable_pal import parseNum
 
 # Read in the actual DFT calculation results and corresponding combination.
@@ -43,11 +44,23 @@ for obj in objs:
 print("--------------------------------------------------------")
 
 # Read in the "stats" data.  This holds the mean and the standard error of measurement.
-stats, _ = pickle.load(open("../data/final.pickle", 'r'))
+data, stats = pickle.load(open("../data/final.pickle", 'r'))
 
 # Plot it if you want
-plot(stats)
+plot(data)
+pretty_stats(stats)
+pretty_stats_2(stats)
 ```
+
+The final.pickle file is a dump of two objects, let's call them data and stats.  Both are dictionaries with the following keys:
+
+1. PAL_0 - The PAL implementation with an initial 10 trained data points prior to sampling.
+2. PAL - The PAL implementation with no initial training set.
+3. SIMPLE_0 - The PAL implementation with a zero mean prior, as well as the 5/2 matern kernel for a one-hot encoded data set.
+4. SIMPLE - The PAL implementation with a constant mean prior (included as a hyperparameter), as well as the 5/2 matern kernel for a one-hot encoded data set.
+5. SMAC - The pySMAC implementation, with categorical choices for solvent.
+6. SMAC_ORD - The pySMAC implementation, with ordinal choices for solvent.
+7. RANDOM - Random sampling.
 
 ### Generating Plot from Paper
 

@@ -1093,11 +1093,21 @@ body .markdown-body
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;--------------------------------------------------------&quot;</span><span class="p">)</span>
 
 <span class="c1"># Read in the &quot;stats&quot; data.  This holds the mean and the standard error of measurement.</span>
-<span class="n">stats</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">&quot;../data/final.pickle&quot;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span>
+<span class="n">data</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">&quot;../data/final.pickle&quot;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">))</span>
 
 <span class="c1"># Plot it if you want</span>
-<span class="n">plot</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 
+<p>The final.pickle file is a dump of two objects, let&rsquo;s call them data and stats.  Both are dictionaries with the following keys:</p>
+<ol>
+<li>PAL_0 - The PAL implementation with an initial 10 trained data points prior to sampling.</li>
+<li>PAL - The PAL implementation with no initial training set.</li>
+<li>SIMPLE_0 - The PAL implementation with a zero mean prior, as well as the 5/2 matern kernel for a one-hot encoded data set.</li>
+<li>SIMPLE - The PAL implementation with a constant mean prior (included as a hyperparameter), as well as the 5/2 matern kernel for a one-hot encoded data set.</li>
+<li>SMAC - The pySMAC implementation, with categorical choices for solvent.</li>
+<li>SMAC_ORD - The pySMAC implementation, with ordinal choices for solvent.</li>
+<li>RANDOM - Random sampling.</li>
+</ol>
 <h3 id="generating-plot-from-paper">Generating Plot from Paper<a class="headerlink" href="#generating-plot-from-paper" title="Permanent link"></a></h3>
 <p>If you wish to generate the plot from the paper, the code example in Data Structures will do just that.  However, if you want to re-run the optimization yourself, you can do so by simply navigating to the code folder and running the <strong>run.py</strong> script.  Note, this has been re-written slightly to allow for running in both python2.7 and python3.  If run in python2.7, you may see timeouts during the pySMAC simulation (results remain the same).  If running in python3, these timeouts will no longer appear.  All output is generated in an <strong>out</strong> subdirectory, such as the plot itself.  Finally, a table similar to that in the paper will be automatically calculated and printed to the terminal at the end of the calculations.  We recommend reducing the number of replications from 1000 to 100 for pySMAC and PAL for speed.</p></article></body></html>

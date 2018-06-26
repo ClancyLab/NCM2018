@@ -28,8 +28,10 @@ def plot(stats, se_scale=2.0):
     plt.figure(figsize=(10, 8))
 
     # We store the keys to ensure the order is always the same.
-    keys = ["PAL", "SMAC", "SIMPLE", "RANDOM"]
-    offset = {"PAL": 0, "SMAC": 0, "SIMPLE": 0, "RANDOM": 0}
+    keys = ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_BAD", "RANDOM"]
+    offset = {"PAL_0": 10, "PAL": 0, "SMAC": 0, "SMAC_BAD": 0, "SIMPLE": 0, "RANDOM": 0}
+    # keys = ["PAL", "SIMPLE", "SMAC", "SMAC_BAD", "RANDOM"]
+    # offset = {"PAL": 0, "SMAC": 0, "SMAC_BAD": 0, "SIMPLE": 0, "RANDOM": 0}
     for key in keys:
         N_POINTS = len(stats[key][0])
         mu, se = stats[key]
@@ -44,12 +46,18 @@ def plot(stats, se_scale=2.0):
         plt.plot(range(offset[key], N_POINTS), mu, label=key, linewidth=3)
         plt.fill_between(range(offset[key], N_POINTS), mu - se_scale * se, mu + se_scale * se, alpha=0.5)
 
-    plt.legend(bbox_to_anchor=(1, 0.15), fontsize=12)
+    plt.legend(bbox_to_anchor=(0.99, 0.2), fontsize=12)
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
 
-    plt.xlim([1, 50])
-    plt.ylim([-42 * KT300_to_KJMOL, -37 * KT300_to_KJMOL])
+    plt.xlim([0, 60])
+    plt.ylim([-42 * KT300_to_KJMOL, -15 * KT300_to_KJMOL])
+
+    # plt.xlim([1, 240])
+    # plt.ylim([-41.35 * KT300_to_KJMOL, -41 * KT300_to_KJMOL])
+
+    # plt.xlim([1, 50])
+    # plt.ylim([-42 * KT300_to_KJMOL, -37 * KT300_to_KJMOL])
 
     plt.xlabel("Number of Observations", fontsize=16)
     plt.ylabel("Intermolecular Binding Energy (kJ/mol)", fontsize=16)
@@ -57,19 +65,20 @@ def plot(stats, se_scale=2.0):
     plt.gca().invert_yaxis()
 
     # Make a section for our training set region (if we had one)
-    if offset["PAL"] > 0:
-        xvals = np.arange(0, offset["PAL"] + 1)
+    if offset["PAL_0"] > 0:
+        xvals = np.arange(0, offset["PAL_0"] + 1)
         yvals1 = [10 * KT300_to_KJMOL for x in xvals]
         yvals2 = [-100 * KT300_to_KJMOL for x in xvals]
         plt.fill_between(xvals, yvals1, yvals2, facecolor='gray', alpha=0.3)
-        plt.text(2, -40 * KT300_to_KJMOL, "PAL Training\n    Region")
+        plt.text(2, -40 * KT300_to_KJMOL, "PAL_0 Training\n    Region")
 
     if not os.path.exists("out"):
         os.mkdir("out")
 
+    # plt.show()
     plt.savefig("out/bench.png")
 
 
 if __name__ == "__main__":
-    a, _ = pickle.load(open("final.pickle", 'rb'))
+    a, _ = pickle.load(open("../data/final.pickle", 'rb'))
     plot(a)

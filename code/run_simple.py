@@ -33,8 +33,8 @@ def run_replication(run, START, use_eps, use_rho, data, data_x2, data_x, data_y,
                 hps = pal.MLE(x, y, sp, method='simple')
 
             # Set prior
-            mu = np.array([0.0 for i in data_x])
-            cov = pal.mk52(np.array([list(xx) + list(ss) for xx, ss in zip(data_x, data_sp)]), hps[:-1], hps[-1])
+            mu = np.array([hps[-1] for i in data_x])
+            cov = pal.mk52(np.array([list(xx) + list(ss) for xx, ss in zip(data_x, data_sp)]), hps[:-2], hps[-2])
 
             # Update the posterior
             for sx, sy, ssp, sample in zip(x, y, sp, samples):

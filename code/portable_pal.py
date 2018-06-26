@@ -168,7 +168,8 @@ def MLE_parallel(x, y, sp, n_start=None, method=None):
             (1E-3, 1),  # c_FA
             (1E-3, 1),  # c_MA
             (1E-3, 1),  # Dielectric
-            (1E-3, 1)  # sigma
+            (1E-3, 1),  # sigma
+            (1E-3, max(y))  # constant prior
         ]
 
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
@@ -242,7 +243,8 @@ def MLE(x, y, sp, n_start=None, method=None):
             (1E-3, 1),  # c_FA
             (1E-3, 1),  # c_MA
             (1E-3, 1),  # Dielectric
-            (1E-3, 1)  # sigma
+            (1E-3, 1),  # sigma
+            (1E-3, max(y))  # constant prior
         ]
 
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
@@ -303,8 +305,8 @@ def likelihood(x, y, sp, simple, theta):
     # ASSUME: HP = [mu_alpha, sig_alpha, sig_beta, mu_zeta, sig_zeta, sig_m, l1, l2]
 
     if simple:
-        mu = np.array([0.0 for i in x])
-        cov = mk52([list(xx) + list(ss) for xx, ss in zip(x, sp)], theta[:-1], theta[-1])
+        mu = np.array([theta[-1] for i in x])
+        cov = mk52([list(xx) + list(ss) for xx, ss in zip(x, sp)], theta[:-2], theta[-2])
     else:
         mu = np.array([4 * theta[0] + theta[3] for i in x])
         cov = theta[1] * np.dot(x, x.T) +\
