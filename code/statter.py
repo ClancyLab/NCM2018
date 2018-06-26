@@ -62,7 +62,7 @@ def _spaced_print(sOut, delim=['\t', ' '], buf=4):
 
 
 def pretty_stats(stats, p=0.999):
-    data = "Methods\tAvg\tStd\t%d%%\tReplications\n" % int(p * 100)
+    data = "Methods\tAvg\tStd\t%.1f%%\tReplications\n" % (p * 100.0)
     for key in ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]:
         avg = np.mean(stats[key][0])
         std = np.std(stats[key][0])

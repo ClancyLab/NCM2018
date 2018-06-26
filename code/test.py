@@ -3,6 +3,7 @@ import cPickle as pickle
 # Note - to import this you'll either have to be in the same folder as plotter
 # and portable_pal, or add that path to your PYTHONPATH environment variable.
 from plotter import plot
+from statter import pretty_stats, pretty_stats_2
 from portable_pal import parseNum
 
 # Read in the actual DFT calculation results and corresponding combination.
@@ -17,7 +18,9 @@ for obj in objs:
 print("--------------------------------------------------------")
 
 # Read in the "stats" data.  This holds the mean and the standard error of measurement.
-stats, _ = pickle.load(open("../data/final.pickle", 'r'))
+data, stats = pickle.load(open("../data/final.pickle", 'r'))
 
 # Plot it if you want
-plot(stats)
+plot(data)
+pretty_stats(stats)
+pretty_stats_2(stats)

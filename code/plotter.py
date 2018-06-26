@@ -28,10 +28,10 @@ def plot(stats, se_scale=2.0):
     plt.figure(figsize=(10, 8))
 
     # We store the keys to ensure the order is always the same.
-    keys = ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_BAD", "RANDOM"]
-    offset = {"PAL_0": 10, "PAL": 0, "SMAC": 0, "SMAC_BAD": 0, "SIMPLE": 0, "RANDOM": 0}
-    # keys = ["PAL", "SIMPLE", "SMAC", "SMAC_BAD", "RANDOM"]
-    # offset = {"PAL": 0, "SMAC": 0, "SMAC_BAD": 0, "SIMPLE": 0, "RANDOM": 0}
+    keys = ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]
+    offset = {"PAL_0": 0, "PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0}
+    # keys = ["PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]
+    # offset = {"PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0}
     for key in keys:
         N_POINTS = len(stats[key][0])
         mu, se = stats[key]
@@ -46,7 +46,7 @@ def plot(stats, se_scale=2.0):
         plt.plot(range(offset[key], N_POINTS), mu, label=key, linewidth=3)
         plt.fill_between(range(offset[key], N_POINTS), mu - se_scale * se, mu + se_scale * se, alpha=0.5)
 
-    plt.legend(bbox_to_anchor=(0.99, 0.2), fontsize=12)
+    plt.legend(bbox_to_anchor=(0.99, 0.3), fontsize=12)
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
 
@@ -70,7 +70,7 @@ def plot(stats, se_scale=2.0):
         yvals1 = [10 * KT300_to_KJMOL for x in xvals]
         yvals2 = [-100 * KT300_to_KJMOL for x in xvals]
         plt.fill_between(xvals, yvals1, yvals2, facecolor='gray', alpha=0.3)
-        plt.text(2, -40 * KT300_to_KJMOL, "PAL_0 Training\n    Region")
+        plt.text(0.4, -16 * KT300_to_KJMOL, "PAL_0 Training\n    Region", fontsize=12)
 
     if not os.path.exists("out"):
         os.mkdir("out")
