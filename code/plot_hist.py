@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 fig = plt.figure(figsize=(10, 8))
 
 # Only use the following line if you have enough ram to handle the random data
-names = ["random", "smac_ord", "smac", "simple", "pal", "pal_0"]
-# names = ["smac_ord", "smac", "simple", "pal", "pal_0"]
+names = ["random", "smac_ord", "smac", "hutter", "simple", "pal", "pal_0"]
 
 for i, path in enumerate(names):
     pal = pickle.load(open("../data/out/best_%s.dat" % path, 'r'))

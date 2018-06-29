@@ -19,7 +19,7 @@ else:
 KT300_to_KJMOL = 2.4942796
 
 
-def plot(stats, se_scale=2.0):
+def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM", "HUTTER"]):
     '''
     This function automates the plotting of the image in our paper.
     '''
@@ -28,8 +28,7 @@ def plot(stats, se_scale=2.0):
     plt.figure(figsize=(10, 8))
 
     # We store the keys to ensure the order is always the same.
-    keys = ["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]
-    offset = {"PAL_0": 0, "PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0}
+    offset = {"PAL_0": 0, "PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0, "HUTTER": 0}
     # keys = ["PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]
     # offset = {"PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0}
     for key in keys:
@@ -80,5 +79,5 @@ def plot(stats, se_scale=2.0):
 
 
 if __name__ == "__main__":
-    a, _ = pickle.load(open("../data/final.pickle", 'rb'))
+    a, _ = pickle.load(open("out/final2.pickle", 'rb'))
     plot(a)

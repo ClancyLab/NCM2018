@@ -111,14 +111,21 @@ def updatePosterior(mu, cov, x, y, debug=None):
 
 def opt_hps_parallel(dat):
     x, y, sp, val, bnds = dat
-    f = lambda *args: -1.0 * likelihood(x, y, sp, False, *args)
+    f = lambda *args: -1.0 * likelihood(x, y, sp, None, *args)
     res = op.minimize(f, val, bounds=bnds)
     return res['x'], res.fun
 
 
 def opt_hps_parallel_simple(dat):
     x, y, sp, val, bnds = dat
-    f = lambda *args: -1.0 * likelihood(x, y, sp, True, *args)
+    f = lambda *args: -1.0 * likelihood(x, y, sp, 'simple', *args)
+    res = op.minimize(f, val, bounds=bnds)
+    return res['x'], res.fun
+
+
+def opt_hps_parallel_hutter(dat):
+    x, y, sp, val, bnds = dat
+    f = lambda *args: -1.0 * likelihood(x, y, sp, 'hutter', *args)
     res = op.minimize(f, val, bounds=bnds)
     return res['x'], res.fun
 
@@ -171,6 +178,16 @@ def MLE_parallel(x, y, sp, n_start=None, method=None):
             (1E-3, 1),  # sigma
             (1E-3, max(y))  # constant prior
         ]
+    elif method is not None and method == "hutter":
+        bounds = [
+            (1E-3, 1),  # h1
+            (1E-3, 1),  # h2
+            (1E-3, 1),  # h3
+            (1E-3, 1),  # c
+            (1E-3, 1),  # Dielectric
+            (1E-3, 1),  # sigma
+            (1E-3, max(y))  # constant prior
+        ]
 
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
 
@@ -183,9 +200,11 @@ def MLE_parallel(x, y, sp, n_start=None, method=None):
     lkh_list = np.zeros(n_start)
 
     pool = mp.Pool(processes=PROCESSES_ALLOWED)
-    # print '\n'.join([str(i) for i in init_values])
+
     if method is not None and method == "simple":
         all_res = pool.map(opt_hps_parallel_simple, init_values)
+    elif method is not None and method == "hutter":
+        all_res = pool.map(opt_hps_parallel_hutter, init_values)
     else:
         all_res = pool.map(opt_hps_parallel, init_values)
     pool.terminate()
@@ -246,6 +265,16 @@ def MLE(x, y, sp, n_start=None, method=None):
             (1E-3, 1),  # sigma
             (1E-3, max(y))  # constant prior
         ]
+    elif method is not None and method == "hutter":
+        bounds = [
+            (1E-3, 1),  # h1
+            (1E-3, 1),  # h2
+            (1E-3, 1),  # h3
+            (1E-3, 1),  # c
+            (1E-3, 1),  # Dielectric
+            (1E-3, 1),  # sigma
+            (1E-3, max(y))  # constant prior
+        ]
 
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
 
@@ -258,10 +287,7 @@ def MLE(x, y, sp, n_start=None, method=None):
     lkh_list = np.zeros(n_start)
     # MLE = Maximum Likelihood Estimation.  But we use a minimizer! So invert the
     # likelihood instead.
-    if method is not None and method == 'simple':
-        f = lambda *args: -1.0 * likelihood(x, y, sp, True, *args)
-    else:
-        f = lambda *args: -1.0 * likelihood(x, y, sp, False, *args)
+    f = lambda *args: -1.0 * likelihood(x, y, sp, method, *args)
 
     # For each possible starting of parameters, minimize and store the resulting likelihood
     for i in range(n_start):
@@ -276,7 +302,7 @@ def MLE(x, y, sp, n_start=None, method=None):
     return best_theta
 
 
-def likelihood(x, y, sp, simple, theta):
+def likelihood(x, y, sp, method, theta):
     '''
     This function computes the likehood of solubilities given hyper parameters
     in the list theta.
@@ -304,9 +330,19 @@ def likelihood(x, y, sp, simple, theta):
 
     # ASSUME: HP = [mu_alpha, sig_alpha, sig_beta, mu_zeta, sig_zeta, sig_m, l1, l2]
 
+    if method is None:
+        simple, hutter = False, False
+    else:
+        simple = method == "simple"
+        hutter = method == "hutter"
+
     if simple:
         mu = np.array([theta[-1] for i in x])
         cov = mk52([list(xx) + list(ss) for xx, ss in zip(x, sp)], theta[:-2], theta[-2])
+    elif hutter:
+        mu = np.array([theta[-1] for i in x])
+        weights = [theta[0].tolist()] * 3 + [theta[1].tolist()] * 3 + [theta[2].tolist()] * 3 + [theta[3].tolist()] * 3 + theta[4:-2].tolist()
+        cov = mk52([list(xx) + list(ss) for xx, ss in zip(x, sp)], weights, theta[-2])
     else:
         mu = np.array([4 * theta[0] + theta[3] for i in x])
         cov = theta[1] * np.dot(x, x.T) +\

@@ -17,6 +17,7 @@ else:
 
 
 def run_replication(run, START, use_eps, use_rho, data, data_x2, data_x, data_y, data_sp, NUM_REOPT, parallel):
+    method = 'simple'
     samples = pal.getSamples(START, eps=use_eps, rho=use_rho)
     samples = [pal.get_index(data_x2, np.array(s[:-1]), use_eps=use_eps, use_rho=use_rho) for s in samples]
     x = np.array([data_x[i] for i in samples])
@@ -28,13 +29,20 @@ def run_replication(run, START, use_eps, use_rho, data, data_x2, data_x, data_y,
         if (not j % NUM_REOPT) or (len(x) - NUM_REOPT < 0):
             # Update the hyperparameters
             if parallel:
-                hps = pal.MLE_parallel(x, y, sp, method='simple')
+                hps = pal.MLE_parallel(x, y, sp, method=method)
             else:
-                hps = pal.MLE(x, y, sp, method='simple')
+                hps = pal.MLE(x, y, sp, method=method)
 
             # Set prior
             mu = np.array([hps[-1] for i in data_x])
-            cov = pal.mk52(np.array([list(xx) + list(ss) for xx, ss in zip(data_x, data_sp)]), hps[:-2], hps[-2])
+
+            if method == "simple":
+                cov = pal.mk52(np.array([list(xx) + list(ss) for xx, ss in zip(data_x, data_sp)]), hps[:-2], hps[-2])
+            elif method == "hutter":
+                weights = [hps[0].tolist()] * 3 + [hps[1].tolist()] * 3 + [hps[2].tolist()] * 3 + [hps[3].tolist()] * 3 + hps[4:-2].tolist()
+                cov = pal.mk52(np.array([list(xx) + list(ss) for xx, ss in zip(data_x, data_sp)]), weights, hps[-2])
+            else:
+                raise Exception("Method not accounted for!")
 
             # Update the posterior
             for sx, sy, ssp, sample in zip(x, y, sp, samples):
@@ -125,6 +133,8 @@ def run_simple(dataset, stats, NUM_RUNS=1000, parallel=True, on_queue=False):
     START = 1
     NUM_REOPT = 10
 
+    # NOTE!!!! FOR SIMPLE AND HUTTER METHODS, WE ONLY HAVE PORTABLE PAL WRITTEN TO
+    # ACCOUNT FOR use_rho = False and use_eps = True, SO DON"T CHANGE THIS!
     use_rho = False
     use_eps = True
 
