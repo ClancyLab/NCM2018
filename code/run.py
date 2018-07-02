@@ -15,11 +15,11 @@ import os
 import sys
 
 from run_pal import run_pal
-from run_pal_0 import run_pal_0
+# from run_pal_0 import run_pal_0
 from run_simple import run_simple
 from run_hutter import run_hutter
 from run_pysmac import run_pysmac
-from run_pysmac_ord import run_pysmac_ord
+# from run_pysmac_ord import run_pysmac_ord
 from run_random import run_random
 from plotter import plot
 from statter import pretty_stats, pretty_stats_2
@@ -35,20 +35,24 @@ assert not os.path.exists("out"), "Error - Will not run whilst the out folder ex
 os.mkdir("out")
 
 dataset, stats = {}, {}
-dataset, stats = run_pal_0(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
+# dataset, stats = run_pal_0(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
 dataset, stats = run_pal(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
 dataset, stats = run_simple(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
 dataset, stats = run_hutter(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
 dataset, stats = run_pysmac(dataset, stats, NUM_RUNS=10, on_queue=True)  # Default, NUM_RUNS = 1,000
-dataset, stats = run_pysmac_ord(dataset, stats, NUM_RUNS=10, on_queue=True)  # Default, NUM_RUNS = 1,000
+# dataset, stats = run_pysmac_ord(dataset, stats, NUM_RUNS=10, on_queue=True)  # Default, NUM_RUNS = 1,000
 dataset, stats = run_random(dataset, stats, NUM_RUNS=10000)  # Default, NUM_RUNS = 1,000,000
 
 print("\nAll Done!")
 print("-------------------------------------------------")
 
 pickle.dump([dataset, stats], open("out/final.pickle", 'wb'))
-plot(dataset)
-pretty_stats(stats)
-pretty_stats_2(stats)
+keys = ["PAL", "SIMPLE", "HUTTER", "SMAC", "RANDOM"]
+aliases_plot = {"SIMPLE": "Simple BO", "SMAC": "pySMAC", "HUTTER": "Hutter BO", "RANDOM": "Random"}
+aliases_stat = {"SIMPLE": "Simple_BO", "SMAC": "pySMAC", "HUTTER": "Hutter_BO", "RANDOM": "Random"}
+
+plot(dataset, keys=keys, aliases=aliases_plot)
+pretty_stats(stats, keys=keys, aliases=aliases_stat)
+pretty_stats_2(stats, keys=keys, aliases=aliases_stat)
 
 print("-------------------------------------------------")

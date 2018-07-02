@@ -8,7 +8,10 @@ fig = plt.figure(figsize=(10, 8))
 # Only use the following line if you have enough ram to handle the random data
 # names = ["random", "smac_ord", "smac", "hutter", "simple", "pal", "pal_0"]
 names = ["pal", "simple", "hutter", "smac", "random"]
-aliases = {"SIMPLE": "Simple BO", "SMAC": "pySMAC", "HUTTER": "Hutter BO", "RANDOM": "Random"}
+aliases = {"simple": "Simple BO", "smac": "pySMAC", "hutter": "Hutter BO", "pal": "PAL", "random": "Random"}
+for name in names:
+    if name not in aliases:
+        aliases[name] = name
 
 for i, path in enumerate(names):
     pal = pickle.load(open("../data/out/best_%s.dat" % path, 'r'))
