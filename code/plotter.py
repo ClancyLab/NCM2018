@@ -9,6 +9,46 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from collections import OrderedDict
+
+
+linestyles = [
+    (0, ()),
+    (0, (1, 1)),
+
+    (0, (5, 10)),
+    (0, (5, 5)),
+
+    (0, (3, 1, 1, 1)),
+    (0, (3, 10, 1, 10)),
+    (0, (5, 1)),
+    (0, (3, 5, 1, 5)),
+
+    (0, (3, 10, 1, 10, 1, 10)),
+    (0, (3, 5, 1, 5, 1, 5)),
+    (0, (3, 1, 1, 1, 1, 1)),
+    (0, (1, 10)),
+    (0, (1, 5)),
+]
+
+
+colors = [
+    'green',
+    'navy',
+    'dodgerblue',
+    'orange',
+    'black',
+    'black',
+    'black',
+    'black',
+    'black',
+    'black',
+    'black',
+    'black',
+    'black',
+]
+
+
 if sys.version_info[0] == 2:
     import cPickle as pickle
 elif sys.version_info[0] == 3:
@@ -33,6 +73,8 @@ def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD"
 
     # We store the keys to ensure the order is always the same.
     offset = {"PAL_0": 0, "PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0, "HUTTER": 0}
+    ls = {k: linestyles[i] for i, k in enumerate(keys)}
+    lc = {k: colors[i] for i, k in enumerate(keys)}
     # keys = ["PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM"]
     # offset = {"PAL": 0, "SMAC": 0, "SMAC_ORD": 0, "SIMPLE": 0, "RANDOM": 0}
     for key in keys:
@@ -46,8 +88,8 @@ def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD"
         mu = mu * KT300_to_KJMOL
         se = se * KT300_to_KJMOL
 
-        plt.plot(range(offset[key], N_POINTS), mu, label=aliases[key], linewidth=3)
-        plt.fill_between(range(offset[key], N_POINTS), mu - se_scale * se, mu + se_scale * se, alpha=0.5)
+        plt.plot(range(offset[key], N_POINTS), mu, linestyle=ls[key], color=lc[key], label=aliases[key], linewidth=3)
+        plt.fill_between(range(offset[key], N_POINTS), mu - se_scale * se, mu + se_scale * se, color=lc[key], alpha=0.5)
 
     plt.legend(bbox_to_anchor=(0.99, 0.3), fontsize=12)
     plt.xticks(fontsize=12)
@@ -83,7 +125,8 @@ def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD"
 
 
 if __name__ == "__main__":
-    a, _ = pickle.load(open("out/final2.pickle", 'rb'))
+    a, _ = pickle.load(open("../data/final.pickle", 'rb'))
+    # a, _ = pickle.load(open("out/final2.pickle", 'rb'))
     keys = ["PAL", "SIMPLE", "HUTTER", "SMAC", "RANDOM"]
     aliases = {"SIMPLE": "Simple BO", "SMAC": "pySMAC", "HUTTER": "Hutter BO", "RANDOM": "Random"}
     plot(a, keys=keys, aliases=aliases)
