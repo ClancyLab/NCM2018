@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 fig = plt.figure(figsize=(10, 8))
 
 # Only use the following line if you have enough ram to handle the random data
-names = ["random", "smac_ord", "smac", "hutter", "simple", "pal", "pal_0"]
+# names = ["random", "smac_ord", "smac", "hutter", "simple", "pal", "pal_0"]
+names = ["pal", "simple", "hutter", "smac", "random"]
+aliases = {"SIMPLE": "Simple BO", "SMAC": "pySMAC", "HUTTER": "Hutter BO", "RANDOM": "Random"}
 
 for i, path in enumerate(names):
     pal = pickle.load(open("../data/out/best_%s.dat" % path, 'r'))
@@ -17,7 +19,7 @@ for i, path in enumerate(names):
     ax = plt.subplot(len(names), 1, i + 1)
 
     # the bins should be of integer width, because poisson is an integer distribution
-    entries, bin_edges, _ = ax.hist(dist, label=path, bins=25, range=[-0.5, 240.5], normed=True)
+    entries, bin_edges, _ = ax.hist(dist, label=aliases[path], bins=25, range=[-0.5, 240.5], normed=True)
 
     plt.legend(loc="center left", bbox_to_anchor=[1.0, 0.5], shadow=True, fancybox=True)
     plt.ylim(0, 0.055)

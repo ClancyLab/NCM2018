@@ -19,10 +19,14 @@ else:
 KT300_to_KJMOL = 2.4942796
 
 
-def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM", "HUTTER"]):
+def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD", "RANDOM", "HUTTER"], aliases={}):
     '''
     This function automates the plotting of the image in our paper.
     '''
+
+    for key in keys:
+        if key not in aliases:
+            aliases[key] = key
 
     # Larger image
     plt.figure(figsize=(10, 8))
@@ -42,7 +46,7 @@ def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD"
         mu = mu * KT300_to_KJMOL
         se = se * KT300_to_KJMOL
 
-        plt.plot(range(offset[key], N_POINTS), mu, label=key, linewidth=3)
+        plt.plot(range(offset[key], N_POINTS), mu, label=aliases[key], linewidth=3)
         plt.fill_between(range(offset[key], N_POINTS), mu - se_scale * se, mu + se_scale * se, alpha=0.5)
 
     plt.legend(bbox_to_anchor=(0.99, 0.3), fontsize=12)
@@ -80,4 +84,6 @@ def plot(stats, se_scale=2.0, keys=["PAL_0", "PAL", "SIMPLE", "SMAC", "SMAC_ORD"
 
 if __name__ == "__main__":
     a, _ = pickle.load(open("out/final2.pickle", 'rb'))
-    plot(a)
+    keys = ["PAL", "SIMPLE", "HUTTER", "SMAC", "RANDOM"]
+    aliases = {"SIMPLE": "Simple BO", "SMAC": "pySMAC", "HUTTER": "Hutter BO", "RANDOM": "Random"}
+    plot(a, keys=keys, aliases=aliases)
