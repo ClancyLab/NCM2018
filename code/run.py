@@ -35,12 +35,10 @@ assert not os.path.exists("out"), "Error - Will not run whilst the out folder ex
 os.mkdir("out")
 
 dataset, stats = {}, {}
-# dataset, stats = run_pal_0(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
-dataset, stats = run_pal(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
-dataset, stats = run_simple(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
-dataset, stats = run_hutter(dataset, stats, NUM_RUNS=10, parallel=True, on_queue=True)  # Default, NUM_RUNS = 1,000
-dataset, stats = run_pysmac(dataset, stats, NUM_RUNS=10, on_queue=True)  # Default, NUM_RUNS = 1,000
-# dataset, stats = run_pysmac_ord(dataset, stats, NUM_RUNS=10, on_queue=True)  # Default, NUM_RUNS = 1,000
+dataset, stats = run_pal(dataset, stats, NUM_RUNS=10, parallel=False, on_queue=False)  # Default, NUM_RUNS = 1,000
+dataset, stats = run_simple(dataset, stats, NUM_RUNS=10, parallel=False, on_queue=False)  # Default, NUM_RUNS = 1,000
+dataset, stats = run_hutter(dataset, stats, NUM_RUNS=10, parallel=False, on_queue=False)  # Default, NUM_RUNS = 1,000
+dataset, stats = run_pysmac(dataset, stats, NUM_RUNS=10, on_queue=False)  # Default, NUM_RUNS = 1,000
 dataset, stats = run_random(dataset, stats, NUM_RUNS=10000)  # Default, NUM_RUNS = 1,000,000
 
 print("\nAll Done!")
