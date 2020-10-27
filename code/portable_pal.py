@@ -176,7 +176,7 @@ def MLE_parallel(x, y, sp, n_start=None, method=None):
             (1E-3, 1),  # c_MA
             (1E-3, 1),  # Dielectric
             (1E-3, 1),  # sigma
-            (1E-3, max(y))  # constant prior
+            (1E-3, max(1.0, max(y)))  # constant prior
         ]
     elif method is not None and method == "hutter":
         bounds = [
@@ -186,7 +186,7 @@ def MLE_parallel(x, y, sp, n_start=None, method=None):
             (1E-3, 1),  # c
             (1E-3, 1),  # Dielectric
             (1E-3, 1),  # sigma
-            (1E-3, max(y))  # constant prior
+            (1E-3, max(1.0, max(y)))  # constant prior
         ]
 
     sampled_values = doe_lhs.lhs(len(bounds), samples=n_start)
