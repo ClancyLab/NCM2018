@@ -5,7 +5,7 @@ import re
 import sys
 import time
 import scipy
-import doe_lhs
+from pyDOE import doe_lhs
 import subprocess
 import getpass
 import numpy as np
